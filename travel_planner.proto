@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package travel_planner;
+
+// -------- INPUT --------
+message TripRequest {
+  string city = 1;
+  string start_date = 2;  // YYYY-MM-DD
+  string end_date = 3;    // YYYY-MM-DD
+  map<string, string> preferences = 4;
+}
+
+message NLTripRequest {
+  string query = 1; // "Plan a 2-day trip to Paris starting tomorrow"
+}
+
+// -------- POIs --------
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message PointOfInterest {
+  string name = 1;
+  string category = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string description = 5;
+}
+
+message POICollection {
+  string city = 1;
+  Location center = 2;
+  repeated PointOfInterest pois = 3;
+}
+
+// -------- WEATHER --------
+message WeatherDay {
+  string date = 1;
+  string summary = 2;
+  double max_temp = 3;
+  double min_temp = 4;
+  int32 weather_code = 5;
+}
+
+message WeatherForecast {
+  double latitude = 1;
+  double longitude = 2;
+  repeated WeatherDay daily = 3;
+}
+
+// -------- ITINERARY --------
+message DayPlan {
+  string date = 1;
+  string morning = 2;
+  string afternoon = 3;
+  string evening = 4;
+  string notes = 5;
+}
+
+message Itinerary {
+  repeated DayPlan days = 1;
+}
+
+// -------- META --------
+message ToolExecution {
+  string tool_name = 1;
+  string result_summary = 2;
+}
+
+message ExecutionMetadata {
+  repeated ToolExecution tools_called = 1;
+  repeated string errors = 2;
+}
+
+// -------- FULL RESPONSE --------
+message TripPlan {
+  POICollection pois = 1;
+  WeatherForecast weather = 2;
+  Itinerary itinerary = 3;
+  ExecutionMetadata meta = 4;
+}
+
+// -------- SERVICE --------
+service TravelPlanner {
+  rpc PlanTrip(TripRequest) returns (TripPlan);
+  rpc PlanTripNL(NLTripRequest) returns (TripPlan);
+}
